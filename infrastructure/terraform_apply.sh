@@ -1,0 +1,1 @@
+terraform init && terraform fmt --recursive && terraform apply -target module.domain.aws_route53_zone.main -var-file config.tfvars --auto-approve && terraform apply -var-file config.tfvars --auto-approve
