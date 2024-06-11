@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: hw-app
-          image: ${ecr_domain}:${image_tag}
+          image: 134317053521.dkr.ecr.ap-southeast-1.amazonaws.com/hw-ecr:12bf0ba600e84449bb116cefeba64e05c7e3a91c
           ports:
             - containerPort: 3000
           env:

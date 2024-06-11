@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-      contents: read
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,16 +45,13 @@ jobs:
         run: |
           docker build -f ./app/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          sed -i "s|\${ecr_domain}|$ECR_REGISTRY/$ECR_REPOSITORY|g" ./app/manifests/deployment.yaml
-          sed -i "s|\${image_tag}|${{ github.sha }}|g" ./app/manifests/deployment.yaml
+          sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}|g" ./app/manifests/deployment.yaml
       
       - name: Echo updated Kubernetes manifest
         run: |
           cat ./app/manifests/deployment.yaml
     
       - name: Commit changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
