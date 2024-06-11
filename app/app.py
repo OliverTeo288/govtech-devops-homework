@@ -11,7 +11,7 @@ def index():
     # Assuming ALB health check user-agent contains 'ELB-HealthChecker'
     if 'ELB-HealthChecker' not in user_agent:
         count = redis_client.incr('counter')
-        return f'This is the {count} visitor'
+        return f'This is the {count} visitor test'
     return 'Health check', 200
 
 
