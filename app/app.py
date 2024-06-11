@@ -8,10 +8,9 @@ redis_client = redis.Redis(host=redis_host, port=6379, db=0, decode_responses=Tr
 @app.route('/')
 def index():
     user_agent = request.headers.get('User-Agent', '')
-    # Assuming ALB health check user-agent contains 'ELB-HealthChecker'
     if 'ELB-HealthChecker' not in user_agent:
         count = redis_client.incr('counter')
-        return f'This is the {count} visitor dog'
+        return f'This is the {count} visitor Oliver website'
     return 'Health check', 200
 
 
