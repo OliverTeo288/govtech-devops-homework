@@ -31,6 +31,7 @@ module "eks" {
 
 
   eks_managed_node_group_defaults = {
+    ami_type  = "AL2023_ARM_64_STANDARD"
     disk_size = 50
   }
 
@@ -40,7 +41,7 @@ module "eks" {
       max_size     = 3
       desired_size = 1
 
-      instance_types = ["t3.medium"]
+      instance_types = ["t4g.medium"]
     }
   }
 

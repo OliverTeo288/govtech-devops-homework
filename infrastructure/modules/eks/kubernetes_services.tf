@@ -1,3 +1,5 @@
+### Ingress
+
 resource "kubernetes_ingress_v1" "hw_ingress" {
   metadata {
     name = "hw-ingress"
@@ -42,9 +44,9 @@ resource "kubernetes_ingress_v1" "hw_ingress" {
           path_type = "Prefix"
           backend {
             service {
-              name = kubernetes_service.example.metadata[0].name
+              name = kubernetes_service.hw_app_service.metadata[0].name
               port {
-                number = 80
+                number = 3000
               }
             }
           }
@@ -54,7 +56,9 @@ resource "kubernetes_ingress_v1" "hw_ingress" {
   }
 }
 
-resource "kubernetes_service" "example" {
+### Application
+
+resource "kubernetes_service" "hw_app_service" {
   metadata {
     name      = "hw-service"
     namespace = "default"
@@ -62,47 +66,109 @@ resource "kubernetes_service" "example" {
 
   spec {
     selector = {
-      app = "example"
+      app = "hw-app"
     }
 
     port {
-      port        = 80
-      target_port = 80
+      port        = 3000
+      target_port = 3000
     }
 
     type = "NodePort"
   }
 }
 
-resource "kubernetes_deployment" "example" {
+resource "kubernetes_deployment" "hw_app_deployment" {
   metadata {
-    name      = "example-deployment"
+    name      = "hw-app-deployment"
     namespace = "default"
   }
 
   spec {
-    replicas = 2
+    replicas = 1
 
     selector {
       match_labels = {
-        app = "example"
+        app = "hw-app"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "example"
+          app = "hw-app"
         }
       }
 
       spec {
         container {
-          name  = "example"
-          image = "nginx:latest"
+          name  = "hw-app"
+          image = "${var.app_ecr}:latest"
 
           port {
-            container_port = 80
+            container_port = 3000
+          }
+          env {
+            name  = "REDIS_HOST"
+            value = "redis-service"
+          }
+        }
+      }
+    }
+  }
+}
+
+### DB Service
+
+resource "kubernetes_service" "redis" {
+  metadata {
+    name      = "redis-service"
+    namespace = "default"
+  }
+
+  spec {
+    selector = {
+      app = "redis"
+    }
+
+    port {
+      port        = 6379
+      target_port = 6379
+    }
+
+    type = "ClusterIP"
+  }
+}
+
+resource "kubernetes_deployment" "redis" {
+  metadata {
+    name      = "redis-deployment"
+    namespace = "default"
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "redis"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "redis"
+        }
+      }
+
+      spec {
+        container {
+          name  = "redis"
+          image = "redis:latest"
+
+          port {
+            container_port = 6379
           }
         }
       }

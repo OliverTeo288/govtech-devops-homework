@@ -60,6 +60,14 @@ module "security_groups" {
 
 }
 
+module "oidc" {
+  source = "./modules/github_oidc"
+
+  github_organization = "OliverTeo288"
+  github_repositories = ["govtech-devops-homework"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"]
+}
+
 module "ecr" {
   source = "./modules/ecr"
 }
@@ -79,4 +87,6 @@ module "eks" {
   vpc_id      = module.vpc.hw_vpc.id
   app_subnets = [module.subnet.app_subnet_a.id, module.subnet.app_subnet_b.id]
   app_acm_arn = module.acm.app_cert.arn
+
+  app_ecr = module.ecr.hw_ecr.repository_url
 }
