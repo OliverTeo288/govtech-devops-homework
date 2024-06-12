@@ -19,15 +19,20 @@ module "domain" {
   cloudflare_api_token = var.cloudflare_api_token
   cloudflare_zone_id   = var.cloudflare_zone_id
 
-  app_acm_domains = module.acm.app_cert
+  app_acm_domains    = module.acm.app_cert
+  cf_app_acm_domains = module.acm.cf_app_cert
 
-  hw_ingress_domain  = module.eks.hw_ingress_hostname
-  hw_ingress_zone_id = module.eks.hw_ingress_zone_id
+  cf_domain_name = module.cloudfront.hw_cloudfront.domain_name
+  cf_zone_id     = module.cloudfront.hw_cloudfront.hosted_zone_id
+  # ALB Only
+  # hw_ingress_domain  = module.eks.hw_ingress_hostname
+  # hw_ingress_zone_id = module.eks.hw_ingress_zone_id
 }
 
 module "acm" {
-  source     = "./modules/acm"
-  app_domain = var.hosted_zone_domain
+  source       = "./modules/acm"
+  app_domain   = var.hosted_zone_domain
+  profile_name = var.profile
 
 }
 
@@ -89,4 +94,14 @@ module "eks" {
   app_acm_arn = module.acm.app_cert.arn
 
   app_ecr = module.ecr.hw_ecr.repository_url
+}
+
+module "cloudfront" {
+  source = "./modules/cloudfront"
+
+  profile_name       = var.profile
+  alb_host_name      = module.eks.hw_ingress_hostname
+  hosted_zone_domain = var.hosted_zone_domain
+  cf_app_acm_arn     = module.acm.cf_app_cert.arn
+
 }

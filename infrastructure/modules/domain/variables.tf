@@ -13,10 +13,25 @@ variable "cloudflare_zone_id" {
 variable "app_acm_domains" {
 
 }
-variable "hw_ingress_domain" {
+
+variable "cf_app_acm_domains" {
 
 }
 
-variable "hw_ingress_zone_id" {
+variable "cf_domain_name" {
 
 }
+
+variable "cf_zone_id" {
+
+}
+
+### ALB Only
+
+# variable "hw_ingress_domain" {
+
+# }
+
+# variable "hw_ingress_zone_id" {
+
+# }

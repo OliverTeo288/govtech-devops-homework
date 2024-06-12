@@ -8,37 +8,23 @@ resource "kubernetes_ingress_v1" "hw_ingress" {
       "kubernetes.io/ingress.class"            = "alb"
       "alb.ingress.kubernetes.io/scheme"       = "internet-facing"
       "alb.ingress.kubernetes.io/target-type"  = "ip"
-      "alb.ingress.kubernetes.io/listen-ports" = "[{\"HTTP\": 80}, {\"HTTPS\": 443}]"
-      "alb.ingress.kubernetes.io/actions.ssl-redirect" = jsonencode({
-        "Type" : "redirect",
-        "RedirectConfig" : {
-          "Protocol" : "HTTPS",
-          "Port" : "443",
-          "StatusCode" : "HTTP_301"
-        }
-      })
-      "alb.ingress.kubernetes.io/certificate-arn"  = var.app_acm_arn
+      "alb.ingress.kubernetes.io/listen-ports" = "[{\"HTTP\": 80}]"
+      # "alb.ingress.kubernetes.io/listen-ports" = "[{\"HTTP\": 80}, {\"HTTPS\": 443}]"
+      # "alb.ingress.kubernetes.io/actions.ssl-redirect" = jsonencode({
+      #   "Type" : "redirect",
+      #   "RedirectConfig" : {
+      #     "Protocol" : "HTTPS",
+      #     "Port" : "443",
+      #     "StatusCode" : "HTTP_301"
+      #   }
+      # })
+      # "alb.ingress.kubernetes.io/certificate-arn"  = var.app_acm_arn
       "alb.ingress.kubernetes.io/backend-protocol" = "HTTP"
     }
   }
-
   spec {
     rule {
-
       http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = "ssl-redirect"
-              port {
-                name = "use-annotation"
-              }
-            }
-          }
-        }
-
         path {
           path      = "/"
           path_type = "Prefix"
@@ -54,6 +40,38 @@ resource "kubernetes_ingress_v1" "hw_ingress" {
       }
     }
   }
+  # spec {
+  #   rule {
+
+  #     http {
+  #       path {
+  #         path      = "/"
+  #         path_type = "Prefix"
+  #         backend {
+  #           service {
+  #             name = "ssl-redirect"
+  #             port {
+  #               name = "use-annotation"
+  #             }
+  #           }
+  #         }
+  #       }
+
+  #       path {
+  #         path      = "/"
+  #         path_type = "Prefix"
+  #         backend {
+  #           service {
+  #             name = kubernetes_service.hw_app_service.metadata[0].name
+  #             port {
+  #               number = 3000
+  #             }
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 ### Application
@@ -115,6 +133,10 @@ resource "kubernetes_deployment" "hw_app_deployment" {
         }
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [spec, metadata]
   }
 }
 

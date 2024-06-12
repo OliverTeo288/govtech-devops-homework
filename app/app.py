@@ -10,7 +10,7 @@ def index():
     user_agent = request.headers.get('User-Agent', '')
     if 'ELB-HealthChecker' not in user_agent:
         count = redis_client.incr('counter')
-        return f'This is the {count} visitor Oliver website'
+        return f'This is the {count} visitor'
     return 'Health check', 200
 
 
