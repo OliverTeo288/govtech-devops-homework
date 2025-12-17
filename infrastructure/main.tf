@@ -33,7 +33,6 @@ module "acm" {
   source       = "./modules/acm"
   app_domain   = var.hosted_zone_domain
   profile_name = var.profile
-
 }
 
 module "vpc" {
@@ -61,9 +60,14 @@ module "routetables" {
 module "security_groups" {
   source = "./modules/securitygroups"
   vpc_id = module.vpc.hw_vpc.id
-
-
 }
+
+
+module "security_group" {
+  source = "./modules/securitygroups"
+  vpc_id = module.vpc.hw_vpc.id
+}
+
 
 module "oidc" {
   source = "./modules/github_oidc"
